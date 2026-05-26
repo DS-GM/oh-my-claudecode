@@ -48,13 +48,13 @@ function findWorkspaceRoot(startDir) {
   let cursor = current;
   let result = null;
   while (true) {
+    if (home && cursor === home) break;
     if (existsSync(join2(cursor, WORKSPACE_MARKER))) {
       result = cursor;
       break;
     }
     const parent = dirname(cursor);
     if (parent === cursor) break;
-    if (home && cursor === home) break;
     cursor = parent;
   }
   if (workspaceCacheMap.size >= MAX_WORKTREE_CACHE_SIZE) {

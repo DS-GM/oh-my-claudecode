@@ -96,13 +96,15 @@ export function findWorkspaceRoot(startDir?: string): string | null {
   let cursor = current;
   let result: string | null = null;
   while (true) {
+    // Stop before scanning $HOME (or above) so a stray ~/.omc-workspace does
+    // not collapse unrelated repos under home into one shared state root.
+    if (home && cursor === home) break;
     if (existsSync(join(cursor, WORKSPACE_MARKER))) {
       result = cursor;
       break;
     }
     const parent = dirname(cursor);
     if (parent === cursor) break;
-    if (home && cursor === home) break;
     cursor = parent;
   }
 

@@ -442,4 +442,28 @@ describe('session-start template cwd validation (Wave B1)', () => {
       rmSync(wsProject, { recursive: true, force: true });
     }
   });
+
+  it('does NOT warn or skip when cwd is a SUBDIRECTORY of a .git repo (walks up)', () => {
+    const gitProject = mkdtempSync(join(tmpdir(), 'omc-git-subdir-'));
+    try {
+      mkdirSync(join(gitProject, '.git'), { recursive: true });
+      mkdirSync(join(gitProject, '.omc', 'state'), { recursive: true });
+      const nested = join(gitProject, 'packages', 'app', 'src');
+      mkdirSync(nested, { recursive: true });
+
+      const { stderr, stdout } = runSessionStartRaw({
+        hook_event_name: 'SessionStart',
+        session_id: 'session-git-subdir',
+        cwd: nested,
+      });
+
+      // A subdirectory of a real repo must be accepted, not rejected.
+      expect(stderr).not.toContain('[OMC] session-start: refusing to use cwd');
+
+      const parsed = JSON.parse(stdout) as { continue: boolean };
+      expect(parsed.continue).toBe(true);
+    } finally {
+      rmSync(gitProject, { recursive: true, force: true });
+    }
+  });
 });

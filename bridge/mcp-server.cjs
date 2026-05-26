@@ -20903,13 +20903,13 @@ function findWorkspaceRoot(startDir) {
   let cursor = current;
   let result = null;
   while (true) {
+    if (home && cursor === home) break;
     if ((0, import_fs10.existsSync)((0, import_path11.join)(cursor, WORKSPACE_MARKER))) {
       result = cursor;
       break;
     }
     const parent = (0, import_path11.dirname)(cursor);
     if (parent === cursor) break;
-    if (home && cursor === home) break;
     cursor = parent;
   }
   if (workspaceCacheMap.size >= MAX_WORKTREE_CACHE_SIZE) {
